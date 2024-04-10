@@ -23,8 +23,8 @@ const firebaseConfig = {
   measurementId: 'G-0XQB64VHFR',
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const app = initializeApp(firebaseConfig); //實例化firebase
+const db = getFirestore(app); //實例化db
 function App() {
   const [userName, setUserName] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -52,16 +52,16 @@ function App() {
   };
   const listenFriendsReq = () => {
     if (!myId) return;
-    const userDocRef = doc(db, 'users', myId);
+    const userDocRef = doc(db, 'users', myId); //取得文檔(doc)的引用
     console.log('userDocRef: ', userDocRef);
-    return onSnapshot(userDocRef, async (docSnapshot) => {
+    return onSnapshot(userDocRef, async (docSnapshot) => {// 監聽文檔裡面的變化, 回傳的是監聽的function (onSnapshot)
       const friendRequests = docSnapshot.data().friendRequests?.from || [];
       console.log('聽好友', friendRequests);
       setFriendRequestID(friendRequests);
       const abc = await getUserNames(friendRequests);
       setFriendRequest(abc);
       const friends = docSnapshot.data().friends || [];
-      if(friends.includes(userId)){
+      if (friends.includes(userId)) {
         setIsFriend(true);
       }
       const def = await getUserNames(friends);
@@ -69,11 +69,11 @@ function App() {
     });
   };
   const loginInit = async () => {
-    const userDocRef = doc(db, 'users', myId);
+    const userDocRef = doc(db, 'users', myId); //根據ID取得文檔引用
     try {
-      const docSnapshot = await getDoc(userDocRef);
+      const docSnapshot = await getDoc(userDocRef);//取得單一文檔的快照
       if (docSnapshot.exists()) {
-        const userData = docSnapshot.data();
+        const userData = docSnapshot.data();//取得文檔裡面的所有data
         const friendRequests = userData.friendRequests?.from || [];
         console.log('登入找朋友', friendRequests);
         const abc = await getUserNames(friendRequests);
@@ -92,11 +92,11 @@ function App() {
     loginInit();
 
     // const postUnsubscribe = listenPost();
-    const friendsReqUnsubscribe = listenFriendsReq();
+    const friendsReqUnsubscribe = listenFriendsReq(); //監聽的function本身會回傳一個關閉監聽的function
     return () => {
       // postUnsubscribe();
       if (friendsReqUnsubscribe) {
-        friendsReqUnsubscribe();
+        friendsReqUnsubscribe(); // 在特定條件會執行關閉監聽的function
       }
     };
   }, [userId]);
@@ -122,18 +122,18 @@ function App() {
     };
     let userId;
     try {
-      const querySnapshot = await getDocs(
-        query(collection(db, 'users'), where('email', '==', userData.email))
+      const querySnapshot = await getDocs( //從所有文檔裡面找(所以是getDocs)
+        query(collection(db, 'users'), where('email', '==', userData.email))//根據條件篩選出指定的文檔條件，這裡是要找到文檔裡面data 符合  userData.email 的文件
       );
       if (querySnapshot.empty) {
-        const userDoc = await addDoc(collection(db, 'users'), userData);
+        const userDoc = await addDoc(collection(db, 'users'), userData); //addDoc會添加文檔到指定的collection，並自動生成不重複的ID， 另一種firebase的方法是setDoc(可以指定文檔ID)
         userData.id = userDoc.id;
         const newUserData = {
           ...userData,
           id: userDoc.id,
         };
         userId = userDoc.id;
-        await updateDoc(doc(db, 'users', userDoc.id), newUserData);
+        await updateDoc(doc(db, 'users', userDoc.id), newUserData); //根據collection和文檔ID更新文檔的內容
         console.log('新增新用戶', userId);
       } else {
         userId = querySnapshot.docs[0].id;
@@ -305,10 +305,10 @@ function App() {
       friendData.friends = friendData.friends || [];
       friendData.friends.push(myId);
       await updateDoc(friendDocRef, friendData);
-        if(friendRequestID.includes(friendId)){
-          sethasGetReq(false);
-          setIsFriend(true)
-        }
+      if (friendRequestID.includes(friendId)) {
+        sethasGetReq(false);
+        setIsFriend(true);
+      }
       console.log(`成功++: ${friendId}。`);
     } catch (error) {
       console.error('添加出錯', error);
@@ -364,9 +364,11 @@ function App() {
     const userDocRef = doc(db, 'users', userId);
     const userSnapshot = await getDoc(userDocRef);
     const userFriendRequests = userSnapshot.data().friendRequests;
-    userFriendRequests.from = userFriendRequests.from.filter((id) => id !== myId);
+    userFriendRequests.from = userFriendRequests.from.filter(
+      (id) => id !== myId
+    );
 
-    await updateDoc(userDocRef,{
+    await updateDoc(userDocRef, {
       friendRequests: userFriendRequests,
     });
 
@@ -375,11 +377,11 @@ function App() {
     const myFriendRequests = mySnapshot.data().friendRequests;
     myFriendRequests.to = myFriendRequests.to.filter((id) => id !== userId);
 
-    await updateDoc(myDocRef,{
+    await updateDoc(myDocRef, {
       friendRequests: myFriendRequests,
     });
-    setHasSended(false)
-};
+    setHasSended(false);
+  };
 
   return (
     <>
