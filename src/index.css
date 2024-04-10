@@ -1,0 +1,30 @@
+*{
+box-sizing: border-box;
+}
+.topDiv {
+  width: 500px;
+  display: flex;
+}
+.postDiv{
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.postDiv > input, .postDiv >select {
+  width: 100%;
+  height: 25px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 0 10px;
+}
+.postDiv button {
+  height: 35px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+.findUserDiv {
+  width: 100%;
+  display: flex;
+  gap:20px
+}
